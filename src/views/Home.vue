@@ -1,7 +1,7 @@
 <!--
  * @Author: 刘任志
  * @Date: 2020-10-15 16:06:14
- * @LastEditTime: 2020-10-15 17:54:45
+ * @LastEditTime: 2020-10-16 15:02:11
  * @Description: vue3 语法练习
 -->
 <template>
@@ -21,17 +21,57 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-
-export default defineComponent({
+import {
+  ref,
+  reactive,
+  toRefs,
+  onBeforeMount,
+  onMounted,
+  onBeforeUpdate,
+  onUpdated,
+  watch,
+} from "vue";
+interface DataProps {
+  goods: string[];
+  selectGood: string;
+  selectFun: (index: number) => void;
+}
+// ref 基础数据类型响应式
+// reactive 引用类型的响应式 (但结构之后内部不再具有响应式)
+// toRefs 将reactive内部都转换成响应式的
+export default {
   name: "Home",
   setup() {
-    const goods = ref(["蛋糕", "糖果", "面包"]);
-    const selectGood = ref("");
-    const selectFun = (index: number) => {
-      selectGood.value = goods.value[index];
-    };
-    return { goods, selectGood, selectFun };
+    // setup 就是created,beforeCreate的结合
+    console.log("setup");
+    const data: DataProps = reactive({
+      goods: ["蛋糕", "糖果", "面包"],
+      selectGood: ref("我是"),
+      selectFun: (index: number) => {
+        data.selectGood = data.goods[index];
+      },
+    });
+    const refData = toRefs(data);
+    onBeforeMount(() => {
+      console.log("beforemount");
+    });
+    onMounted(() => {
+      console.log("mounted");
+    });
+    onBeforeUpdate(() => {
+      console.log("beforeUpdate");
+    });
+    onUpdated(() => {
+      console.log("updated");
+    });
+    watch(
+      () => data.selectGood,
+      (oldVal, newVal) => {
+        console.log(oldVal);
+        console.log(newVal);
+      }
+    );
+    return { ...refData };
   },
-});
+};
 </script>
